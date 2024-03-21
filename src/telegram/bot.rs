@@ -20,7 +20,7 @@ impl TelegramBot {
             format!("https://api.telegram.org/bot{}", telegram_token)
         );
 
-        TelegramBot{
+        Self {
             base_url,
             http_client: blocking::Client::new()
         }
