@@ -11,15 +11,15 @@ fn can_create_bot() {
 }
 
 
-#[test]
-fn can_get_me() {
+#[tokio::test]
+async fn can_get_me() {
     dotenv::dotenv().expect("Can not read dotenv file");
 
     let bot_token = env::var("TG_BOT_TOKEN")
         .expect("Can not read token");
-    
+
     let bot = TelegramBot::new(bot_token);
-    let result = bot.get_me().expect("Can not get result");
+    let result = bot.get_me().await.expect("Can not get bot info");
     
     assert_eq!(result.is_bot, true);
 }

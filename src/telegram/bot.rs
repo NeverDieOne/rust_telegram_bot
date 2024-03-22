@@ -1,4 +1,4 @@
-use reqwest::blocking;
+use reqwest::Client;
 use super::types;
 use serde_json::Value;
 use std::{error::Error, collections::HashMap};
@@ -10,7 +10,7 @@ type TgResult<T> = Result<T, Box<dyn Error>>;
 #[derive(Debug)]
 pub struct TelegramBot {
     base_url: String,
-    http_client: blocking::Client,
+    http_client: Client,
 }
 
 
@@ -22,30 +22,30 @@ impl TelegramBot {
 
         Self {
             base_url,
-            http_client: blocking::Client::new()
+            http_client: Client::new()
         }
     }
 
-    pub fn get_me(&self) -> TgResult<types::User> {
+    pub async fn get_me(&self) -> TgResult<types::User> {
         let url = format!("{}/getMe", self.base_url);
-        let response = self.http_client.get(url).send()?;
+        let response = self.http_client.get(url).send().await?;
         response.error_for_status_ref()?;
-        let raw_user: Value = response.json()?;
+        let raw_user: Value = response.json().await?;
         Ok(serde_json::from_value(raw_user["result"].to_owned())?)
     }
 
-    pub fn get_updates(&self, params: &HashMap<&str, String>) -> TgResult<Vec<types::Update>> {
+    pub async fn get_updates(&self, params: &HashMap<&str, String>) -> TgResult<Vec<types::Update>> {
         let url = format!("{}/getUpdates", self.base_url);
         let response = self.http_client
             .get(url)
             .query(&params)
-            .send()?;
+            .send().await?;
         response.error_for_status_ref()?;
-        let raw_updates: Value = response.json()?;
+        let raw_updates: Value = response.json().await?;
         Ok(serde_json::from_value(raw_updates["result"].to_owned())?)
     }
 
-    pub fn send_message(&self, chat_id: i32, text: &String) -> TgResult<types::Message> {
+    pub async fn send_message(&self, chat_id: i32, text: &String) -> TgResult<types::Message> {
         let url = format!("{}/sendMessage", self.base_url);
         let _chat_id = &chat_id.to_string();
 
@@ -55,9 +55,9 @@ impl TelegramBot {
         let response = self.http_client
             .get(url)
             .query(&params)
-            .send()?;
+            .send().await?;
         response.error_for_status_ref()?;
-        let raw_message: Value = response.json()?;
+        let raw_message: Value = response.json().await?;
         Ok(serde_json::from_value(raw_message["result"].to_owned())?)
     }
 }
