@@ -1,2 +1,4 @@
-pub mod bot;
+mod bot;
 pub mod types;
+
+pub use bot::TelegramBot;

@@ -1,7 +1,7 @@
 use std::env;
 use dotenv;
 
-use rust_telegram_bot::telegram::bot::TelegramBot; 
+use rust_telegram_bot::telegram::TelegramBot; 
 
 
 
